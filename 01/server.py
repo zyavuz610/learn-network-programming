@@ -32,7 +32,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             data = conn.recv(1024)
             
             # Eğer veri yoksa (bağlantı kapatılmışsa), döngüyü sonlandır
-            if not data:
+            if str(data) == ":q":
                 break
                 
             # Alınan veriyi geri gönder
