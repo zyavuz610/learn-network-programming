@@ -1,0 +1,5 @@
+Bu FTP server üzerindeki data.txt dosyasıdır.
+Bu dosya client tarafından indirilebilir.
+FTP protokolü test verisidir.
+Dosya boyutu: yaklaşık 150 byte
+Oluşturulma tarihi: 2025-09-10 23:28:41
