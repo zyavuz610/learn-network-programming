@@ -45,8 +45,8 @@ context = ssl.create_default_context()
 try:
     with smtplib.SMTP(smtp_server, port) as server:
         server.starttls(context=context)  # TLS'i başlat
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message.as_string())
+        server.login(sender_email, password) # sunucuya güvenli şekilde giriş yap
+        server.sendmail(sender_email, receiver_email, message.as_string()) # e-postayı gönder
     print("E-posta başarıyla gönderildi!")
 except Exception as e:
     print(f"E-posta gönderilirken bir hata oluştu: {e}")
