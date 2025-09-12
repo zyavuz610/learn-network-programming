@@ -410,4 +410,78 @@ def auto_download_data_txt(client):
     
     # data.txt'yi indir
     print("\n2. data.txt dosyası indiriliyor...")
-    success
+    success = client.download_file("data.txt", "downloaded_data.txt")
+    
+    if success:
+        print("\n✓ OTOMATİK İNDİRME BAŞARILI!")
+        print("data.txt -> downloaded_data.txt olarak kaydedildi")
+    else:
+        print("\n✗ Otomatik indirme başarısız!")
+    
+    return success
+
+
+def main():
+    """Ana fonksiyon"""
+    print("=" * 60)
+    print("FTP CLIENT - client.py")
+    print("=" * 60)
+    
+    # Client oluştur
+    client = FTPClient()
+    
+    # Sunucu bilgileri
+    HOST = 'localhost'
+    PORT = 2121
+    USERNAME = 'user'
+    PASSWORD = 'pass'
+    
+    try:
+        # Sunucuya bağlan
+        if not client.connect(HOST, PORT):
+            print("Program sonlandırılıyor...")
+            return
+        
+        # Giriş yap
+        if not client.login(USERNAME, PASSWORD):
+            print("Program sonlandırılıyor...")
+            return
+        
+        # Kullanıcıya seçenek sun
+        print("\n" + "="*50)
+        print("Ne yapmak istiyorsunuz?")
+        print("1. Otomatik data.txt indirme")
+        print("2. İnteraktif menü")
+        print("="*50)
+        
+        while True:
+            choice = input("\nSeçiminiz (1-2): ").strip()
+            
+            if choice == '1':
+                # Otomatik data.txt indirme
+                auto_download_data_txt(client)
+                break
+            
+            elif choice == '2':
+                # İnteraktif menü
+                interactive_menu(client)
+                break
+            
+            else:
+                print("✗ Geçerli seçim yapın (1 veya 2)")
+    
+    except KeyboardInterrupt:
+        print("\n\nProgram kullanıcı tarafından sonlandırıldı")
+    
+    except Exception as e:
+        print(f"\nBeklenmeyen hata: {e}")
+    
+    finally:
+        # Bağlantıyı kapat
+        if client.connected:
+            client.quit()
+        print("Program sonlandı.")
+
+
+if __name__ == "__main__":
+    main()

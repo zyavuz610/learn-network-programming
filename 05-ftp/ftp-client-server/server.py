@@ -9,8 +9,9 @@ class FTPServer:
         self.host = host
         self.port = port
         self.root_dir = root_dir
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # TCP soketi
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Soket yeniden kullanım
+        print(f"FTP Server başlatılıyor... {self.host}:{self.port}")
         
         # Sunucu kök dizinini ve data.txt dosyasını oluştur
         self.setup_server_directory()
@@ -18,7 +19,7 @@ class FTPServer:
     def setup_server_directory(self):
         """Server dizinini ve data.txt dosyasını oluşturur"""
         if not os.path.exists(self.root_dir):
-            os.makedirs(self.root_dir)
+            os.makedirs(self.root_dir) # Klasör yoksa oluştur
             print(f"Server dizini oluşturuldu: {self.root_dir}")
         
         # data.txt dosyasını oluştur
@@ -33,18 +34,22 @@ class FTPServer:
             print(f"data.txt dosyası oluşturuldu: {data_file}")
     
     def start(self):
-        """FTP server'ı başlatır"""
+        # FTP server'ı başlatır
         try:
-            self.socket.bind((self.host, self.port))
-            self.socket.listen(5)
+            self.socket.bind((self.host, self.port)) # Soketi belirtilen IP ve porta bağla
+            self.socket.listen(5) # Gelen bağlantıları dinle (5 bağlantı sıraya alınabilir)
             print(f"FTP Server başlatıldı")
             print(f"Adres: {self.host}:{self.port}")
             print(f"Kök dizin: {os.path.abspath(self.root_dir)}")
             print("İstemci bağlantıları bekleniyor...")
             print("-" * 50)
+            print("> ")
             
             while True:
-                client_socket, address = self.socket.accept()
+                client_socket, address = self.socket.accept() # Gelen bir bağlantıyı kabul et
+
+                # Bağlantı bilgilerini yazdır
+                # address bir tuple (IP, port)
                 print(f"[{time.strftime('%H:%M:%S')}] Yeni bağlantı: {address[0]}:{address[1]}")
                 
                 # Her istemci için ayrı thread başlat
