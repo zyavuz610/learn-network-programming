@@ -1,14 +1,16 @@
 # server.py - FTP Server
-import socket
-import threading
-import os
-import time
+import socket # TCP/IP soketi
+import threading # Çoklu istemci yönetimi için, her istemci için ayrı thread
+import os # Dosya ve dizin işlemleri
+import time # Zaman damgaları için
 
 class FTPServer:
     def __init__(self, host='localhost', port=21, root_dir='ftp_data'):
+        # FTP server'ı başlatır
         self.host = host
         self.port = port
         self.root_dir = root_dir
+        # TCP soket oluştur
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # TCP soketi
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Soket yeniden kullanım
         print(f"FTP Server başlatılıyor... {self.host}:{self.port}")
