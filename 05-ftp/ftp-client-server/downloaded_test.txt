@@ -1,2 +1,0 @@
-Bu bir test dosyasıdır.
-FTP server test için oluşturulmuştur.

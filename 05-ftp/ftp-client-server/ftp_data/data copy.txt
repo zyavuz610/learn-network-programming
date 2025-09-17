@@ -1,0 +1,48 @@
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : LAPTOP-EKME2B7G
+   Primary Dns Suffix  . . . . . . . : 
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+
+Wireless LAN adapter Yerel Ağ Bağlantısı* 1:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : Microsoft Wi-Fi Direct Virtual Adapter
+   Physical Address. . . . . . . . . : 12-68-38-A8-24-2E
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+
+Wireless LAN adapter Yerel Ağ Bağlantısı* 2:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : Microsoft Wi-Fi Direct Virtual Adapter #2
+   Physical Address. . . . . . . . . : 12-68-38-A8-34-3E
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+
+Wireless LAN adapter Wi-Fi:
+
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : MediaTek Wi-Fi 6E MT7902 Wireless LAN Card
+   Physical Address. . . . . . . . . : 10-68-38-A8-04-0E
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : 2a00:1880:a00f:8b34:8677:7ce5:639a:f5ba(Preferred) 
+   Temporary IPv6 Address. . . . . . : 2a00:1880:a00f:8b34:24b1:ec51:fc02:4c0b(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::963a:ba4:b908:8472%14(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.117.177.106(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : 10 Eylül 2025 Çarşamba 20:37:24
+   Lease Expires . . . . . . . . . . : 10 Eylül 2025 Çarşamba 23:43:25
+   Default Gateway . . . . . . . . . : fe80::480d:dfff:fe71:3a53%14
+                                       10.117.177.71
+   DHCP Server . . . . . . . . . . . : 10.117.177.71
+   DHCPv6 IAID . . . . . . . . . . . : 286287928
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-2D-73-12-53-10-68-38-A8-04-0E
+   DNS Servers . . . . . . . . . . . : 10.117.177.71
+                                       2a00:1880:a00f:8b34::c5
+   NetBIOS over Tcpip. . . . . . . . : Enabled
