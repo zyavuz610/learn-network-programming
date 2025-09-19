@@ -95,7 +95,7 @@ class FTPServer:
                 
                 elif data.upper().startswith('PASS'):
                     password = data.split(' ')[1] if len(data.split(' ')) > 1 else ''
-                    print(f"[{client_id}] Şifre alındı")
+                    print(f"[{client_id}] Şifre alındı - {password}")
                     self.send_response(client_socket, "230 Giriş başarılı")
                 
                 elif data.upper() == 'PWD':
