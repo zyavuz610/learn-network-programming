@@ -5,9 +5,15 @@ import socket
 HOST = '127.0.0.1'  # Localhost (yerel makine)
 PORT = 65432        # İletişim için kullanılacak port (1024'ten büyük standart dışı port)
 
-# TCP/IP soketi oluştur:
-# - socket.AF_INET: IPv4 protokolünü belirtir
-# - socket.SOCK_STREAM: Bağlantı tabanlı TCP protokolünü belirtir
+# Soket oluşturma parametreleri:
+# 1. Adres Ailesi (Address Family):
+#    - socket.AF_INET  : IPv4 protokolü (örn: '127.0.0.1')
+#    - socket.AF_INET6 : IPv6 protokolü (örn: '::1')
+#
+# 2. Soket Tipi (Socket Type):
+#    - socket.SOCK_STREAM : TCP protokolü (bağlantı tabanlı, güvenilir ve sıralı veri iletimi)
+#    - socket.SOCK_DGRAM  : UDP protokolü (bağlantısız, hızlı datagram iletimi; listen/accept yerine recvfrom/sendto kullanılır)
+#
 # 'with' bloğu işlem bittiğinde soketin otomatik ve güvenli bir şekilde kapatılmasını sağlar
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
     # Soketi belirtilen IP ve porta bağla
