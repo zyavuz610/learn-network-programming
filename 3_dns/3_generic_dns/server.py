@@ -10,16 +10,17 @@ Bu program, tıpkı Google DNS (8.8.8.8) veya Cloudflare (1.1.1.1) gibi davranan
    Sunucu UDP soketi üzerinden istemcilerden gelen standart DNS sorgularını dinler.
 
 2. Üç Aşamalı Alan Adı Çözümleme:
-   İstemci bir alan adı sorduğunda (Örn: 'ktu.edu.tr', 'google.com'):
-   a) Adım 1 - Özel Yerel Kayıtlar:
-      Sunucu önce kendi yerel listesine (CUSTOM_DOMAINS) bakar. Burada 'ders.local'
-      gibi sadece kendi ağımıza özel adlar tanımlayabiliriz.
+   İstemci bir alan adı sorduğunda (Örn: 'google.com', 'ktu.edu.tr'):
+   a) Adım 1 - Sunucunun Kendi Kayıt Listesi (DNS_RECORDS):
+      Sunucu önce kendi tanımlı listesine bakar. 'google.com', 'ktu.edu.tr',
+      'github.com', 'ders.local' gibi popüler ve yerel alan adları doğrudan bu listeden yanıtlanır.
    b) Adım 2 - Önbellek (DNS Cache):
-      Eğer daha önce sorgulanmışsa, internete tekrar çıkmadan doğrudan hafızadan
-      (Cache HIT) çok hızlı yanıt verir.
+      Listede olmayan ama daha önce internetten çözülmüş bir ad sorulursa,
+      internete tekrar çıkmadan doğrudan hafızadan (Cache HIT) çok hızlı yanıt verir.
    c) Adım 3 - İnternetten Çözümleme (Recursive Resolution):
-      Kayıt henüz bilinmiyorsa, sunucu internetteki gerçek DNS hiyerarşisine danışarak
-      (socket.gethostbyname) IP adresini öğrenir, önbelleğe kaydeder ve istemciye döner.
+      Kayıt ne listede ne de önbellekte varsa, sunucu internetteki gerçek DNS
+      hiyerarşisine danışarak (socket.gethostbyname) IP adresini öğrenir, önbelleğe
+      kaydeder ve istemciye döner.
    d) Alan adı dünyada hiç yoksa standart NXDOMAIN (Kayıt Yok) hatası döner.
 
 NASIL KULLANILIR?
@@ -46,14 +47,27 @@ import socket
 HOST = '127.0.0.1'
 PORT = 5353
 
-# 1. Özel / Yerel DNS Kayıtları (Şirket içi veya ders içi özel alan adları)
-CUSTOM_DOMAINS = {
+# 1. Sunucunun Kendi DNS Kayıtları Listesi (Zone Veritabanı)
+# google.com, ktu.edu.tr gibi popüler alan adları ve yerel alan adları doğrudan bu listeden gönderilir.
+DNS_RECORDS = {
+    'google.com': '142.250.185.206',
+    'www.google.com': '142.250.185.206',
+    'github.com': '140.82.121.4',
+    'ktu.edu.tr': '193.140.70.197',
+    'www.ktu.edu.tr': '193.140.70.197',
+    'youtube.com': '142.250.185.174',
+    'wikipedia.org': '208.80.154.224',
+    'python.org': '138.197.63.241',
+    'stackoverflow.com': '151.101.65.69',
+    'openai.com': '13.107.246.72',
+    'microsoft.com': '20.112.52.29',
+    'amazon.com': '205.251.242.103',
     'ders.local': '10.0.0.1',
     'okul.yerel': '192.168.1.50',
     'proje.test': '127.0.0.1',
 }
 
-# 2. DNS Önbelleği (Cache): Daha önce çözülen alan adları burada saklanır
+# 2. DNS Önbelleği (Cache): Listede olmayan ve internetten çözülen alan adları burada saklanır
 # Format: { 'alan_adi': 'ip_adresi' }
 dns_cache = {}
 
@@ -120,20 +134,22 @@ def create_dns_response(packet, ip_address=None):
 
 def resolve_domain(domain_name):
     """
-    Google DNS mantığı:
-    1. Özel yerel kayıtlara bak.
-    2. Önbelleğe (Cache) bak.
-    3. İnternetteki gerçek DNS hiyerarşisine sorup öğren.
+    DNS Çözümleme Mantığı:
+    1. Aşama: Sunucunun kendi kayıt listesine (DNS_RECORDS) bakar.
+       google.com, ktu.edu.tr, github.com vb. doğrudan bu listeden yanıtlanır.
+    2. Aşama: DNS Önbelleğine (Cache) bakar.
+    3. Aşama: Listede ve önbellekte yoksa, internetteki gerçek DNS hiyerarşisine
+       (socket.gethostbyname) sorarak öğrenir ve önbelleğe ekler.
     """
-    # 1. Aşama: Özel Yerel Kayıtlar
-    if domain_name in CUSTOM_DOMAINS:
-        return CUSTOM_DOMAINS[domain_name], "ÖZEL YEREL KAYIT"
+    # 1. Aşama: Sunucunun Kendi Kayıt Listesi (Örn: google.com, ktu.edu.tr)
+    if domain_name in DNS_RECORDS:
+        return DNS_RECORDS[domain_name], "SUNUCU KENDİ LİSTESİ"
 
     # 2. Aşama: DNS Önbelleği (Cache)
     if domain_name in dns_cache:
         return dns_cache[domain_name], "ÖNBELLEK (CACHE HIT)"
 
-    # 3. Aşama: İnternetten Çözümleme (Recursive Lookup)
+    # 3. Aşama: Listede Olmayan Diğer Alan Adları İçin İnternetten Çözümleme
     try:
         # İşletim sistemi aracılığıyla gerçek internet DNS sunucularına sor
         real_ip = socket.gethostbyname(domain_name)
@@ -159,8 +175,9 @@ def start_generic_dns_server():
         print("=" * 65)
         print("GENEL DNS SUNUCUSU BAŞLATILDI (Google DNS Benzeri Model)")
         print(f"Dinlenen Adres : {HOST}:{PORT} (UDP)")
-        print(f"Özel Kayıtlar  : {list(CUSTOM_DOMAINS.keys())}")
-        print("Hem yerel hem internetteki TÜM alan adları çözümlenebilir.")
+        print(f"Tanımlı Kendi Kayıtları ({len(DNS_RECORDS)} Adet):")
+        print(f"  {', '.join(list(DNS_RECORDS.keys())[:8])} ...")
+        print("google.com gibi kayıtlar kendi listesinden, diğerleri internetten çözülür.")
         print("=" * 65)
         print("İstemcilerden sorgu bekleniyor...\n")
 
