@@ -2,8 +2,7 @@
 Genel Çözümleyici DNS Sunucusu (Recursive / Google DNS Benzeri Sunucu)
 =====================================================================
 
-Bu program, tıpkı Google DNS (8.8.8.8) veya Cloudflare (1.1.1.1) gibi davranan
-öğrenci dostu ve modüler bir DNS sunucusudur.
+Bu program, tıpkı Google DNS (8.8.8.8) veya Cloudflare (1.1.1.1) gibi davranan modüler bir DNS sunucusudur.
 
 ÇALIŞMA MANTIĞI (Google DNS Gibi Nasıl Çalışır?):
 ------------------------------------------------

@@ -34,17 +34,15 @@ başarıyla sorgulama yapabilirsiniz.
 import socket
 import time
 
-# Popüler genel (public) DNS sunucuları
+# Popüler genel (public) DNS sunucuları (İsim, IP, Port)
 PUBLIC_DNS_SERVERS = {
-    '1': ('Google DNS', '8.8.8.8'),
-    '2': ('Cloudflare DNS (En Hızlı)', '1.1.1.1'),
-    '3': ('Quad9 (Zararlı Yazılım Korumalı)', '9.9.9.9'),
-    '4': ('OpenDNS (Cisco)', '208.67.222.222'),
-    '5': ('Yerel Ağ / Kampüs DNS Sunucusu', '192.168.4.66'),
+    '1': ('Google DNS', '8.8.8.8', 53),
+    '2': ('Cloudflare DNS (En Hızlı)', '1.1.1.1', 53),
+    '3': ('Quad9 (Zararlı Yazılım Korumalı)', '9.9.9.9', 53),
+    '4': ('OpenDNS (Cisco)', '208.67.222.222', 53),
+    '5': ('Yerel Ağ / Kampüs DNS Sunucusu', '192.168.4.66', 53),
+    '6': ('Kendi Generic Sunucumuz (Localhost:5353)', '127.0.0.1', 5353),
 }
-
-# Standart DNS portu
-DNS_PORT = 53
 
 
 def build_dns_query(domain_name):
@@ -136,7 +134,7 @@ def parse_dns_response(data):
     }
 
 
-def query_single_dns(server_name, server_ip, domain_name, timeout=3.0):
+def query_single_dns(server_name, server_ip, domain_name, port=53, timeout=3.0):
     """
     Belirtilen genel DNS sunucusuna UDP üzerinden tek bir sorgu gönderir ve sonucu döner.
     """
@@ -146,22 +144,22 @@ def query_single_dns(server_name, server_ip, domain_name, timeout=3.0):
         s.settimeout(timeout)
         try:
             start_time = time.time()
-            s.sendto(query_packet, (server_ip, DNS_PORT))
+            s.sendto(query_packet, (server_ip, port))
             response_data, _ = s.recvfrom(1024)
             elapsed_ms = (time.time() - start_time) * 1000
 
             parsed = parse_dns_response(response_data)
             parsed['rtt_ms'] = elapsed_ms
             parsed['server_name'] = server_name
-            parsed['server_ip'] = server_ip
+            parsed['server_ip'] = f"{server_ip}:{port}"
             return parsed
 
         except socket.timeout:
             return {
                 'status': 'TIMEOUT',
-                'message': 'Zaman aşımı (Sunucudan yanıt gelmedi veya port 53 engelli).',
+                'message': 'Zaman aşımı (Sunucudan yanıt gelmedi veya port engelli).',
                 'server_name': server_name,
-                'server_ip': server_ip,
+                'server_ip': f"{server_ip}:{port}",
                 'rtt_ms': None,
             }
         except Exception as e:
@@ -169,7 +167,7 @@ def query_single_dns(server_name, server_ip, domain_name, timeout=3.0):
                 'status': 'HATA',
                 'message': str(e),
                 'server_name': server_name,
-                'server_ip': server_ip,
+                'server_ip': f"{server_ip}:{port}",
                 'rtt_ms': None,
             }
 
@@ -178,13 +176,13 @@ def print_dns_menu():
     """
     Kullanıcıya seçebileceği genel DNS sunucularını listeler.
     """
-    print("\n" + "=" * 60)
+    print("\n" + "=" * 65)
     print("GENEL (PUBLIC) DNS SUNUCULARI LİSTESİ:")
-    print("=" * 60)
-    for key, (name, ip) in PUBLIC_DNS_SERVERS.items():
-        print(f"  [{key}] {name:<35} : {ip}")
+    print("=" * 65)
+    for key, (name, ip, port) in PUBLIC_DNS_SERVERS.items():
+        print(f"  [{key}] {name:<42} : {ip}:{port}")
     print("  [0] TÜMÜNÜ KARŞILAŞTIR (Hız ve IP Kıyaslama Testi)")
-    print("=" * 60)
+    print("=" * 65)
 
 
 def start_generic_dns_client():
@@ -215,8 +213,8 @@ def start_generic_dns_client():
             if current_choice == '0':
                 aktif_sunucu_adi = "Tüm Genel DNS Sunucuları (Karşılaştırma Modu)"
             else:
-                s_name, s_ip = PUBLIC_DNS_SERVERS[current_choice]
-                aktif_sunucu_adi = f"{s_name} ({s_ip})"
+                s_name, s_ip, s_port = PUBLIC_DNS_SERVERS[current_choice]
+                aktif_sunucu_adi = f"{s_name} ({s_ip}:{s_port})"
 
             print(f"\n[Aktif Sunucu: {aktif_sunucu_adi}]")
             domain = input("Sorgulanacak alan adı (Örn: ktu.edu.tr): ").strip()
@@ -237,26 +235,27 @@ def start_generic_dns_client():
             # [0] Seçilmişse tüm sunucuları karşılaştır
             if current_choice == '0':
                 print("-" * 65)
-                print(f"{'DNS Sunucusu':<25} {'IP Adresi':<16} {'Gecikme (RTT)':<15} {'Durum / Çözümlenen IP'}")
+                print(f"{'DNS Sunucusu':<25} {'IP:Port':<22} {'Gecikme (RTT)':<15} {'Durum / Çözümlenen IP'}")
                 print("-" * 65)
 
-                for k, (s_name, s_ip) in PUBLIC_DNS_SERVERS.items():
-                    res = query_single_dns(s_name, s_ip, domain)
+                for k, (s_name, s_ip, s_port) in PUBLIC_DNS_SERVERS.items():
+                    res = query_single_dns(s_name, s_ip, domain, port=s_port)
                     rtt_str = f"{res['rtt_ms']:.2f} ms" if res['rtt_ms'] else "---"
+                    server_loc = f"{s_ip}:{s_port}"
 
                     if res['status'] == 'OK':
                         ips_str = ", ".join(res['ips'][:2])
                         if len(res['ips']) > 2:
                             ips_str += f" (+{len(res['ips'])-2} IP)"
-                        print(f"{s_name[:24]:<25} {s_ip:<16} {rtt_str:<15} {ips_str}")
+                        print(f"{s_name[:24]:<25} {server_loc:<22} {rtt_str:<15} {ips_str}")
                     else:
-                        print(f"{s_name[:24]:<25} {s_ip:<16} {rtt_str:<15} [{res['status']}] {res['message']}")
+                        print(f"{s_name[:24]:<25} {server_loc:<22} {rtt_str:<15} [{res['status']}] {res['message']}")
                 print("-" * 65)
 
             # Tek bir sunucu seçilmişse detaylı göster
             else:
-                s_name, s_ip = PUBLIC_DNS_SERVERS[current_choice]
-                res = query_single_dns(s_name, s_ip, domain)
+                s_name, s_ip, s_port = PUBLIC_DNS_SERVERS[current_choice]
+                res = query_single_dns(s_name, s_ip, domain, port=s_port)
 
                 print("-" * 50)
                 if res['status'] == 'OK':
