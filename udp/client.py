@@ -57,6 +57,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         # --- [TIMEOUT AÇILDIĞINDA KULLANILACAK BLOK] ---
         # Yukarıdaki `s.settimeout(5.0)` satırını açarsanız, hatayı yakalamak için
         # aşağıdaki try-except bloğunu aktif edip alttaki yalın recvfrom satırlarını yoruma alabilirsiniz:
+        
         # try:
         #     data, server_addr = s.recvfrom(1024)
         #     response = data.decode('utf-8')
@@ -67,7 +68,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 
         data, server_addr = s.recvfrom(1024)
         response = data.decode('utf-8')
-        
         print(f"Sunucudan gelen mesaj: {response}")
         
         if response.lower() == ':q':
